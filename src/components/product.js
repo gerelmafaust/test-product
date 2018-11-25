@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { getProductJson } from "../services/productService";
+import { getProductJson, getProductJsonItem } from "../services/productService";
 
 class Product extends Component {
   state = {
@@ -20,7 +20,21 @@ class Product extends Component {
       });
     }
   }
-  //test
+
+  async handleDetails(anObjectMappedKey) {
+    // save orginalItems
+    const originalItems = this.state.items;
+
+    try {
+      const items = await getProductJsonItem(anObjectMappedKey);
+      this.setState({ items });
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404) console.log(ex);
+
+      // back saved Items to items
+      this.setState({ items: originalItems });
+    }
+  }
 
   getRows() {
     if (this.state.items) {
@@ -39,6 +53,12 @@ class Product extends Component {
               <div className="card-body">
                 <h5 className="card-title"> {anObjectMapped.label}</h5>
                 <p className="card-text"> {anObjectMapped.price}</p>
+                <button
+                  className="sl-btn m-2"
+                  onClick={() => this.handleDetails(anObjectMapped.id)}
+                >
+                  show only me
+                </button>
               </div>
             </div>
           ))}
